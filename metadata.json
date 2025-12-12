@@ -1,0 +1,5 @@
+{
+  "name": "文枢 (Wenshu) - AI Novel Assistant",
+  "description": "An intelligent creative writing assistant for novelists. It features context-aware chapter generation, outline management, and style mimicry using Google Gemini models.",
+  "requestFramePermissions": []
+}

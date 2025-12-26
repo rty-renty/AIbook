@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Novel, Chapter, ChapterStatus } from '../types';
 import { Button } from './Button';
@@ -13,7 +14,6 @@ interface BatchGenerateContentModalProps {
 export const BatchGenerateContentModal: React.FC<BatchGenerateContentModalProps> = ({ novel, isOpen, onClose, onConfirm, isLoading }) => {
   const [selectedChapterIds, setSelectedChapterIds] = useState<Set<string>>(new Set());
 
-  // Automatically select chapters that are drafts and have outlines
   useEffect(() => {
     if (isOpen) {
       const drafts = novel.chapters
@@ -35,6 +35,14 @@ export const BatchGenerateContentModal: React.FC<BatchGenerateContentModalProps>
     setSelectedChapterIds(newSet);
   };
 
+  const handleSelectAll = () => {
+    setSelectedChapterIds(new Set(novel.chapters.map(c => c.id)));
+  };
+
+  const handleSelectNone = () => {
+    setSelectedChapterIds(new Set());
+  };
+
   const handleConfirm = () => {
     onConfirm(Array.from(selectedChapterIds));
   };
@@ -44,13 +52,16 @@ export const BatchGenerateContentModal: React.FC<BatchGenerateContentModalProps>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh] animate-scale-up">
         <div className="p-6 border-b border-paper-200">
           <h2 className="text-xl font-serif font-bold text-ink-900">批量生成正文</h2>
-          <p className="text-sm text-ink-500 mt-1">选择已完善大纲的章节，AI 将逐一为您撰写正文。</p>
+          <p className="text-sm text-ink-500 mt-1">选择已完善大纲的章节进行撰写。</p>
         </div>
 
         <div className="p-6 overflow-y-auto flex-1">
-          <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-ink-700">待生成章节</label>
-            <span className="text-xs text-ink-500">已选: {selectedChapterIds.size}</span>
+          <div className="flex justify-between items-center mb-4">
+             <div className="flex gap-2">
+                <button onClick={handleSelectAll} className="text-xs text-ink-500 hover:text-ink-900 underline">全选</button>
+                <button onClick={handleSelectNone} className="text-xs text-ink-500 hover:text-ink-900 underline">取消全选</button>
+             </div>
+             <span className="text-xs text-ink-700 font-bold">已选: {selectedChapterIds.size} / {novel.chapters.length}</span>
           </div>
           
           <div className="border border-paper-200 rounded-lg max-h-80 overflow-y-auto p-2 bg-paper-50 space-y-1">
@@ -74,15 +85,12 @@ export const BatchGenerateContentModal: React.FC<BatchGenerateContentModalProps>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center mb-0.5">
                       <span className="text-sm font-medium text-ink-800 truncate">{chapter.title}</span>
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${
+                      <span className={`text-[10px] px-1 py-0.5 rounded ${
                         hasContent ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'
                       }`}>
                         {hasContent ? '已有正文' : '待生成'}
                       </span>
                     </div>
-                    <p className="text-xs text-ink-500 truncate">
-                      {hasOutline ? chapter.outline : "（警告：暂无大纲，生成效果可能不佳）"}
-                    </p>
                   </div>
                 </label>
               );
